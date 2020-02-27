@@ -77,6 +77,7 @@ macro(_melt_target _target)
         DEFINITIONS
         INCLUDE_DIRS
         SYSTEM_INCLUDE_DIRS
+        COMPILE_OPTIONS
     )
     cmake_parse_arguments(OPTS
         "${options}"
@@ -128,11 +129,15 @@ macro(_melt_target _target)
     endif()
 
     if(OPTS_HEADERS)
-        set_target_properties(${_target} PROPERTIES HEADER "${OPTS_HEADERS}")
+        set_target_properties(${_target} PROPERTIES HEADER ${OPTS_HEADERS})
     endif()
 
     if(OPTS_DEFINITIONS)
-        target_compile_definitions(${_target} PUBLIC OPTS_DEFINITIONS)
+        target_compile_definitions(${_target} PUBLIC ${OPTS_DEFINITIONS})
+    endif()
+
+    if(OPTS_COMPILE_OPTIONS)
+        target_compile_options(${_target} PUBLIC ${OPTS_COMPILE_OPTIONS})
     endif()
 
     if(NOT OPTS_NO_INSTALL)

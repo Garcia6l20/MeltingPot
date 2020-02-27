@@ -1,11 +1,11 @@
-macro(conan_run)
+macro(conan_requires _requires)
 
   # some default values
   set(CONAN_BUILD outdated)
 
   set(options)
   set(oneValueArgs BUILD)
-  set(multiValueArgs REQUIRES OPTIONS)
+  set(multiValueArgs OPTIONS)
   cmake_parse_arguments(CONAN
       "${options}"
       "${oneValueArgs}"
@@ -30,7 +30,7 @@ macro(conan_run)
 
   conan_cmake_run(
     REQUIRES
-    ${CONAN_REQUIRES}
+    ${_requires}
     OPTIONS
     ${CONAN_OPTIONS}
     BASIC_SETUP
