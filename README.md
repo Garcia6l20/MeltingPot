@@ -9,6 +9,9 @@ An easy to use CMake Tooling Pot
 conan_requires(
     fmt/6.1.0
     boost/1.71.0
+  REPOSITORIES
+    NAME bincrafters URL https://api.bintray.com/conan/bincrafters/public-conan
+    NAME xdev        URL https://api.bintray.com/conan/6l20garcia/xdev
   BUILD missing
   OPTIONS
     boost:header_only=True

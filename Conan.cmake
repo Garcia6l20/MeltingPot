@@ -5,7 +5,7 @@ macro(conan_requires _requires)
 
   set(options)
   set(oneValueArgs BUILD)
-  set(multiValueArgs OPTIONS)
+  set(multiValueArgs OPTIONS REPOSITORIES)
   cmake_parse_arguments(CONAN
       "${options}"
       "${oneValueArgs}"
@@ -25,8 +25,23 @@ macro(conan_requires _requires)
 
   include(${CMAKE_BINARY_DIR}/conan.cmake)
 
-  conan_add_remote(NAME bincrafters URL
-                   https://api.bintray.com/conan/bincrafters/public-conan)
+  list(LENGTH CONAN_REPOSITORIES _len)
+  math(EXPR _len "${_len} - 1")
+  foreach(_ii RANGE 0 ${_len} 4)
+    list(SUBLIST CONAN_REPOSITORIES ${_ii} 4 _repo)
+    cmake_parse_arguments(CONAN_REPO
+      ""
+      "NAME;URL"
+      ""
+      ${_repo}
+    )
+    if(NOT CONAN_REPO_NAME OR NOT CONAN_REPO_URL)
+        message(FATAL_ERROR "REPOSITORIES arguments must match NAME <name> URL <url>")
+    endif()
+    string(STRIP ${CONAN_REPO_NAME} CONAN_REPO_NAME)
+    string(STRIP ${CONAN_REPO_URL} CONAN_REPO_URL)
+    conan_add_remote(NAME ${CONAN_REPO_NAME} URL ${CONAN_REPO_URL})
+  endforeach()
 
   conan_cmake_run(
     REQUIRES
