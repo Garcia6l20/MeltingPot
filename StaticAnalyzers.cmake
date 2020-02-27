@@ -1,6 +1,5 @@
-option(ENABLE_CPPCHECK "Enable static analysis with cppcheck" OFF)
-option(ENABLE_CLANG_TIDY "Enable static analysis with clang-tidy" OFF)
-if(ENABLE_CPPCHECK)
+option(MELT_ENABLE_CPPCHECK "Enable static analysis with cppcheck" OFF)
+if(MELT_ENABLE_CPPCHECK)
  find_program(CPPCHECK cppcheck)
  if(CPPCHECK)
    set(CMAKE_CXX_CPPCHECK ${CPPCHECK} --suppress=missingInclude --enable=all
@@ -10,7 +9,8 @@ if(ENABLE_CPPCHECK)
  endif()
 endif()
 
-if(ENABLE_CLANG_TIDY)
+option(MELT_ENABLE_CLANG_TIDY "Enable static analysis with clang-tidy" OFF)
+if(MELT_ENABLE_CLANG_TIDY)
  find_program(CLANGTIDY clang-tidy)
  if(CLANGTIDY)
    set(CMAKE_CXX_CLANG_TIDY ${CLANGTIDY})

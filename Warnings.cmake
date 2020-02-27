@@ -1,4 +1,4 @@
-option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
+option(MELT_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 
 set(MSVC_WARNINGS
    /W4 # Baseline reasonable warnings
@@ -55,7 +55,7 @@ set(CLANG_WARNINGS
               # (ie printf)
 )
 
-if (WARNINGS_AS_ERRORS)
+if (MELT_WARNINGS_AS_ERRORS)
  set(CLANG_WARNINGS ${CLANG_WARNINGS} -Werror)
  set(MSVC_WARNINGS ${MSVC_WARNINGS} /WX)
 endif()
@@ -72,11 +72,15 @@ set(GCC_WARNINGS
 )
 
 if(MSVC)
- set(PROJECT_WARNINGS ${MSVC_WARNINGS})
+ set(MELT_WARNINGS ${MSVC_WARNINGS})
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
- set(PROJECT_WARNINGS ${CLANG_WARNINGS})
+ set(MELT_WARNINGS ${CLANG_WARNINGS})
 else()
- set(PROJECT_WARNINGS ${GCC_WARNINGS})
+ set(MELT_WARNINGS ${GCC_WARNINGS})
 endif()
 
-target_compile_options(_melt_project INTERFACE ${PROJECT_WARNINGS})
+set(MELT_WARNINGS ${MELT_WARNINGS} CACHE INTERNAL "Melt wanings")
+
+function(melt_setup_wanings _target)
+  target_compile_options(${_target} PRIVATE ${MELT_WARNINGS})
+endfunction()
