@@ -1,2 +1,3 @@
 # MeltingPot
-A easy to use CMake Tooling Pot
+
+An easy to use CMake Tooling Pot

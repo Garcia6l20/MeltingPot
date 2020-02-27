@@ -1,0 +1,7 @@
+option(ENABLE_CTEST_VALGRIND "Enalble vagrind memorycheck of tests" OFF)
+if(ENABLE_CTEST_VALGRIND)
+  find_program(VALGRIND_EXE valgrind)
+  if (VALGRIND_EXE)
+      set(CTEST_MEMORYCHECK_COMMAND "${VALGRIND_EXE}")
+  endif()
+endif()
