@@ -81,6 +81,10 @@ endif()
 
 set(MELT_WARNINGS ${MELT_WARNINGS} CACHE INTERNAL "Melt wanings")
 
+if(MELT_SUPPRESS_WARNINGS)
+    list(REMOVE_ITEM MELT_WARNINGS ${MELT_SUPPRESS_WARNINGS})
+endif()
+
 function(melt_setup_wanings _target)
   target_compile_options(${_target} PRIVATE ${MELT_WARNINGS})
 endfunction()

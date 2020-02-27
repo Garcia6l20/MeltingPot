@@ -1,11 +1,16 @@
+# parse melt options
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.melt_options)
   file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/.melt_options _melt_raw_opts)
   foreach(_raw_opt ${_melt_raw_opts})
-    string(STRIP ${_raw_opt} _raw_opt)
-    set(_var_regex [[^([A-Za-z0-9_]+) *= *([A-Za-z0-9_]+) *]])
-    if(${_raw_opt} MATCHES ${_var_regex})
-      message(STATUS "melt option: ${CMAKE_MATCH_1} = ${CMAKE_MATCH_2}")
-      set(MELT_${CMAKE_MATCH_1} ${CMAKE_MATCH_2})
+    set(_var_regex [[^([A-Za-z0-9_]+) *= *(.+) *$]])
+    if("${_raw_opt}" MATCHES ${_var_regex})
+      set(_opt)
+      foreach(_val ${CMAKE_MATCH_2})
+          string(STRIP ${_val} _val)
+          list(APPEND _opt ${_val})
+      endforeach()
+      set(MELT_${CMAKE_MATCH_1} ${_opt})
+        message(STATUS "melt option: MELT_${CMAKE_MATCH_1} = ${MELT_${CMAKE_MATCH_1}}")
     elseif(${_raw_opt} MATCHES [[\#.*]])
       # comment ignored
     else()
@@ -67,7 +72,7 @@ include(GenerateExportHeader)
 #
 #
 #
-macro(_melt_target _target)
+function(_melt_target _target)
     set(options EXECUTABLE LIBRARY SHARED NO_INSTALL DOXYGEN)
     set(oneValueArgs ALIAS CXX_STANDARD FOLDER)
     set(multiValueArgs
@@ -155,7 +160,7 @@ macro(_melt_target _target)
     if(OPTS_DOXYGEN)
       melt_doxygen(${_target})
     endif()
-endmacro()
+endfunction()
 
 function(melt_library _target)
   _melt_target(${_target} LIBRARY ${ARGN})

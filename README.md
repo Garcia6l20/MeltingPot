@@ -88,6 +88,9 @@ ENABLE_CLANG_TIDY = ON
 
 # Treat compiler warnings as errors
 WARNINGS_AS_ERRORS = ON
+
+# Suppress warnings
+SUPPRESS_WARNINGS = -Wuseless-cast
 ```
 
 ## Status
