@@ -2,6 +2,10 @@
 
 An easy to use CMake Tooling Pot
 
+## Descriptions
+
+This is a set of tools/preset for building high quality c++ code.
+
 ## Target creation
 
 ```cmake
@@ -85,3 +89,17 @@ ENABLE_CLANG_TIDY = ON
 # Treat compiler warnings as errors
 WARNINGS_AS_ERRORS = ON
 ```
+
+## Status
+
+I started this toolkit with recommendations of [Jason Turner](https://github.com/lefticus) and his [cpp_starter_project](https://github.com/lefticus/cpp_starter_project).
+The aim here is to provide a collaborative toolkit with ready-to-use presets.
+From now it's usable by adding this repository as submodule and I'm managing to make it downloadable from a single file.
+
+## Contributing
+
+Any idea is welcome through issues or pull requests.
+
+Rules:
+ - Added features shall be optional an defaulted to OFF, it shall also be added in the the *.metl_options* file (commented) and in this current README (with an example when it make sense).
+ - Respect the first rule.
