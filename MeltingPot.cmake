@@ -11,13 +11,12 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.melt_options)
       endforeach()
       set(MELT_${CMAKE_MATCH_1} ${_opt})
         message(STATUS "melt option: MELT_${CMAKE_MATCH_1} = ${MELT_${CMAKE_MATCH_1}}")
-    elseif(${_raw_opt} MATCHES [[\#.*]])
+    elseif("${_raw_opt}" MATCHES [[\#.*]])
       # comment ignored
     else()
       message(FATAL_ERROR "Bad variable in .melt_options file: ${_raw_opt} should match ${_var_regex}")
     endif()
   endforeach()
-
 endif()
 
 # Set a default build type if none was specified

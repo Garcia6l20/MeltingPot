@@ -6,6 +6,25 @@ An easy to use CMake Tooling Pot
 
 This is a set of tools/preset for building high quality c++ code.
 
+## Setup
+
+1. Put a copy of the config file at the root of your project direclty:
+```bash
+cd <path_to_root_dir>
+curl -O https://raw.githubusercontent.com/Garcia6l20/MeltingPot/v0.1.x/dist/.melt_options
+```
+
+2. Add folowing lines at the top of your root cmake project:
+```cmake
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/MeltingPot.cmake")
+  message(STATUS "Downloading MeltingPot.cmake from https://github.com/Garcia6l20/MeltingPot")
+  file(DOWNLOAD "https://raw.githubusercontent.com/Garcia6l20/MeltingPot/v0.1.x/dist/MeltingPot.cmake" "${CMAKE_BINARY_DIR}/MeltingPot.cmake")
+endif()
+include(${CMAKE_BINARY_DIR}/MeltingPot.cmake)
+```
+
+done !
+
 ## Target creation
 
 ```cmake
@@ -109,7 +128,7 @@ TESTING_DEFAULT_BACKEND = GTEST
 
 I started this toolkit with recommendations of [Jason Turner](https://github.com/lefticus) and his [cpp_starter_project](https://github.com/lefticus/cpp_starter_project).
 The aim here is to provide a collaborative toolkit with ready-to-use presets.
-From now it's usable by adding this repository as submodule and I'm managing to make it downloadable from a single file.
+
 
 ## Contributing
 
