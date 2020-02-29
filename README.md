@@ -8,6 +8,14 @@ This is a set of tools/preset for building high quality c++ code.
 
 ## Setup
 
+### From starter template
+
+1. Go the [starter repository](https://github.com/Garcia6l20/MeltingPot-starter)
+2. Select a starting branch.
+3. Click on *Use template* button.
+
+### Code upgrade
+
 1. Put a copy of the config file at the root of your project direclty:
 ```bash
 cd <path_to_root_dir>
@@ -22,6 +30,8 @@ if(NOT EXISTS "${CMAKE_BINARY_DIR}/MeltingPot.cmake")
 endif()
 include(${CMAKE_BINARY_DIR}/MeltingPot.cmake)
 ```
+
+3. Check the (comming soon) github pages for API reference, and upgrade your targets.
 
 done !
 
