@@ -158,6 +158,14 @@ macro(_melt_target _target)
         target_compile_options(${_target} PUBLIC "${MELT_EXTRA_FLAGS}")
     endif()
 
+    if(MELT_${CMAKE_CXX_COMPILER_ID}_EXTRA_FLAGS)
+        target_compile_options(${_target} PUBLIC "${MELT_${CMAKE_CXX_COMPILER_ID}_EXTRA_FLAGS}")
+    endif()
+
+    if(MELT_${CMAKE_C_COMPILER_ID}_EXTRA_FLAGS)
+        target_compile_options(${_target} PUBLIC "${MELT_${CMAKE_C_COMPILER_ID}_EXTRA_FLAGS}")
+    endif()
+
     if(NOT MELT_ARGS_NO_INSTALL)
         install(TARGETS ${_target}
             LIBRARY
