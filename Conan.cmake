@@ -53,6 +53,10 @@ function(conan_requires)
         endforeach()
     endif()
 
+    if(MELT_TESTING_BACKENDS)
+      list(APPEND _requires ${MELT_TESTING_BACKENDS})
+    endif()
+
     conan_cmake_run(
       REQUIRES ${_requires}
       OPTIONS ${CONAN_OPTIONS}

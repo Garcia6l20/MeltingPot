@@ -91,6 +91,18 @@ WARNINGS_AS_ERRORS = ON
 
 # Suppress warnings
 SUPPRESS_WARNINGS = -Wuseless-cast
+
+# Global extra flags
+EXTRA_FLAGS = -Wno-error=shadow
+
+# Testing backends
+TESTING_BACKENDS = gtest/1.10.0 \
+                   catch2/2.11.0
+
+# Default testing backend
+# When used together you must specify the default backend
+# and/or pass GTEST/CATCH option to melt_add_test to use the required backend
+TESTING_DEFAULT_BACKEND = GTEST
 ```
 
 ## Status
