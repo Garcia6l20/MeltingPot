@@ -64,6 +64,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/Doxygen.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/MemoryCheck.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/Sanitizers.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/StaticAnalyzers.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/Testing.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/Warnings.cmake)
 
 include(GenerateExportHeader)
