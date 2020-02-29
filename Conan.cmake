@@ -4,7 +4,7 @@ function(conan_requires)
       # standard conan installation, deps will be defined in conanfile.py
       # and not necessary to call conan again, conan is already running
       include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-      conan_basic_setup()
+      conan_basic_setup(TARGETS)
   else()
 
     # some default values
@@ -53,6 +53,9 @@ function(conan_requires)
         endforeach()
     endif()
 
+    set(MELT_${PROJECT_NAME}_REQUIRES ${_requires} PARENT_SCOPE)
+    set(MELT_${PROJECT_NAME}_DEFAULT_OPTIONS ${CONAN_OPTIONS} PARENT_SCOPE)
+
     if(MELT_TESTING_BACKENDS)
       list(APPEND _requires ${MELT_TESTING_BACKENDS})
     endif()
@@ -73,4 +76,52 @@ function(conan_requires)
   list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} PARENT_SCOPE)
 
+endfunction()
+
+function(_to_python_list _var)
+  list(JOIN ${_var} "\", \"" _tmp)
+  set(${_var} "\"${_tmp}\"" PARENT_SCOPE)
+endfunction()
+
+function(_to_python_dict_items _var)
+  set(_tmp ${${_var}})
+  list(TRANSFORM _tmp REPLACE [[([A-Za-z_:]+)=([A-Za-z_]+)]] [["\1": \2]])
+  list(JOIN _tmp ", " _tmp)
+  set(${_var} ${_tmp} PARENT_SCOPE)
+endfunction()
+
+function(conan_package)
+
+  set(MELT_PACKAGE_NAME ${PROJECT_NAME})
+  set(MELT_PACKAGE_REQUIRES ${MELT_${PROJECT_NAME}_REQUIRES})
+  set(MELT_PACKAGE_BUILD_REQUIRES ${MELT_TESTING_BACKENDS})
+  message(STATUS "MELT_TESTING_BACKENDS: ${MELT_TESTING_BACKENDS}")
+
+  set(options)
+  set(oneValueArgs LICENSE AUTHOR URL SMC_URL)
+  set(multiValueArgs OPTIONS DEFAULT_OPTIONS TOPICS BUILD_MODULES DESCRIPTION)
+  cmake_parse_arguments(MELT_PACKAGE
+      "${options}"
+      "${oneValueArgs}"
+      "${multiValueArgs}"
+      ${ARGN}
+  )
+  list(APPEND MELT_PACKAGE_DEFAULT_OPTIONS ${MELT_${PROJECT_NAME}_DEFAULT_OPTIONS})
+
+  _to_python_list(MELT_PACKAGE_REQUIRES)
+  _to_python_list(MELT_PACKAGE_BUILD_REQUIRES)
+  _to_python_list(MELT_PACKAGE_TOPICS)
+  _to_python_list(MELT_PACKAGE_BUILD_MODULES)
+  _to_python_dict_items(MELT_PACKAGE_DEFAULT_OPTIONS)
+  list(JOIN MELT_PACKAGE_DESCRIPTION " " MELT_PACKAGE_DESCRIPTION)
+
+  if(NOT MELT_PACKAGE_SMC_URL)
+    set(MELT_PACKAGE_SMC_URL ${MELT_PACKAGE_URL})
+  endif()
+
+  if(NOT EXISTS ${MELT_MODULE_PATH}/conanfile.py.in AND MELD_DIST_VERSION)
+    file(DOWNLOAD "https://raw.githubusercontent.com/Garcia6l20/MeltingPot/${MELD_DIST_VERSION}/dist/conanfile.py.in" "${MELT_MODULE_PATH}/conanfile.py.in")
+  endif()
+
+  configure_file(${MELT_MODULE_PATH}/conanfile.py.in ${CMAKE_SOURCE_DIR}/conanfile.py @ONLY NEWLINE_STYLE LF)
 endfunction()

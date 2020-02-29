@@ -15,10 +15,11 @@ jobs:
         python-version: '3.8'
     - name: Generate
       run: |
-        python dist.py
+        python dist.py "${GITHUB_REF##*/}"
         git config user.name "${{ github.actor }}"
         git config user.email "${{ secrets.DIST_EMAIL }}"
         git add dist/MeltingPot.cmake
+        git add dist/conanfile.py.in
         git add dist/.melt_options
         git commit -m "dist-${GITHUB_REF##*/}"
         git tag ${GITHUB_REF##*/} -f

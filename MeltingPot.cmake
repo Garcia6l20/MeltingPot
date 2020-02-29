@@ -1,6 +1,8 @@
+set(MELT_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
+
 # parse melt options
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.melt_options)
-  file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/.melt_options _melt_raw_opts)
+if(EXISTS ${CMAKE_SOURCE_DIR}/.melt_options)
+  file(STRINGS ${CMAKE_SOURCE_DIR}/.melt_options _melt_raw_opts)
   foreach(_raw_opt ${_melt_raw_opts})
     set(_var_regex [[^([A-Za-z0-9_]+) *= *(.+) *$]])
     if("${_raw_opt}" MATCHES ${_var_regex})
