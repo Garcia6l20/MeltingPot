@@ -8,15 +8,19 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.melt_options)
     if("${_raw_opt}" MATCHES ${_var_regex})
       set(_opt)
       foreach(_val ${CMAKE_MATCH_2})
-          string(STRIP ${_val} _val)
-          list(APPEND _opt ${_val})
+        string(STRIP ${_val} _val)
+        list(APPEND _opt ${_val})
       endforeach()
       set(MELT_${CMAKE_MATCH_1} ${_opt})
-        message(STATUS "melt option: MELT_${CMAKE_MATCH_1} = ${MELT_${CMAKE_MATCH_1}}")
+      message(
+        STATUS "melt option: MELT_${CMAKE_MATCH_1} = ${MELT_${CMAKE_MATCH_1}}")
     elseif("${_raw_opt}" MATCHES [[\#.*]])
       # comment ignored
     else()
-      message(FATAL_ERROR "Bad variable in .melt_options file: ${_raw_opt} should match ${_var_regex}")
+      message(
+        FATAL_ERROR
+          "Bad variable in .melt_options file: ${_raw_opt} should match ${_var_regex}"
+      )
     endif()
   endforeach()
 endif()
@@ -59,7 +63,6 @@ if(MELT_ENABLE_IPO)
   endif()
 endif()
 
-
 include(${CMAKE_CURRENT_LIST_DIR}/Conan.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/Doxygen.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/MemoryCheck.cmake)
@@ -70,124 +73,125 @@ include(${CMAKE_CURRENT_LIST_DIR}/Warnings.cmake)
 
 include(GenerateExportHeader)
 
-
 # extends those args to extend melt_library/executable
-set(_MELT_TARGET_PARSE_OPTIONS
-  IS_EXECUTABLE
-  IS_LIBRARY
-  SHARED
-  NO_INSTALL
-  DOXYGEN
-)
-set(_MELT_TARGET_PARSE_ONE_VALUE_ARGS
-  ALIAS
-  CXX_STANDARD
-  FOLDER
-)
+set(_MELT_TARGET_PARSE_OPTIONS IS_EXECUTABLE IS_LIBRARY SHARED NO_INSTALL
+                               DOXYGEN)
+set(_MELT_TARGET_PARSE_ONE_VALUE_ARGS ALIAS CXX_STANDARD FOLDER)
 set(_MELT_TARGET_PARSE_MULTI_VALUE_ARGS
-  SOURCES
-  HEADERS
-  LIBRARIES
-  DEFINITIONS
-  INCLUDE_DIRS
-  SYSTEM_INCLUDE_DIRS
-  COMPILE_OPTIONS
-)
+    SOURCES
+    HEADERS
+    LIBRARIES
+    DEFINITIONS
+    INCLUDE_DIRS
+    SYSTEM_INCLUDE_DIRS
+    COMPILE_OPTIONS)
 
 macro(_melt_target _target)
-    cmake_parse_arguments(MELT_ARGS
-        "${_MELT_TARGET_PARSE_OPTIONS}"
-        "${_MELT_TARGET_PARSE_ONE_VALUE_ARGS}"
-        "${_MELT_TARGET_PARSE_MULTI_VALUE_ARGS}"
-        "${ARGN}"
-    )
-    if(MELT_ARGS_IS_EXECUTABLE)
-      add_executable(${_target} ${MELT_ARGS_SOURCES} ${MELT_ARGS_HEADERS})
-    elseif(MELT_ARGS_IS_LIBRARY)
-      if(MELT_ARGS_SHARED)
-          set(_lib_type SHARED)
-      endif()
+  cmake_parse_arguments(
+    MELT_ARGS "${_MELT_TARGET_PARSE_OPTIONS}"
+    "${_MELT_TARGET_PARSE_ONE_VALUE_ARGS}"
+    "${_MELT_TARGET_PARSE_MULTI_VALUE_ARGS}" "${ARGN}")
+  if(MELT_ARGS_IS_EXECUTABLE)
+    add_executable(${_target} ${MELT_ARGS_SOURCES} ${MELT_ARGS_HEADERS})
+  elseif(MELT_ARGS_IS_LIBRARY)
+    if(MELT_ARGS_SHARED)
+      set(_lib_type SHARED)
+    endif()
 
-      add_library(${_target} ${_lib_type} ${MELT_ARGS_SOURCES} ${MELT_ARGS_HEADERS})
-      if(MELT_ARGS_FOLDER)
-          set_target_properties(${_target} PROPERTIES FOLDER ${MELT_ARGS_FOLDER})
-          set(_generated_include_dirs ${PROJECT_BINARY_DIR}/include/${MELT_ARGS_FOLDER})
-      else()
-          set(_generated_include_dirs ${PROJECT_BINARY_DIR}/include)
-      endif()
-
-      generate_export_header(${_target} EXPORT_FILE_NAME ${_generated_include_dirs}/${_target}-export.hpp)
-      list(APPEND MELT_ARGS_HEADERS ${_generated_include_dirs}/${_target}-export.hpp)
-      target_sources(${_target} PUBLIC ${_generated_include_dirs}/${_target}-export.hpp)
-
+    add_library(${_target} ${_lib_type} ${MELT_ARGS_SOURCES}
+                           ${MELT_ARGS_HEADERS})
+    if(MELT_ARGS_FOLDER)
+      set_target_properties(${_target} PROPERTIES FOLDER ${MELT_ARGS_FOLDER})
+      set(_generated_include_dirs
+          ${PROJECT_BINARY_DIR}/include/${MELT_ARGS_FOLDER})
     else()
-      message(FATAL_ERROR "you should use melt_library or melt_executable, not _melt_target direclty")
+      set(_generated_include_dirs ${PROJECT_BINARY_DIR}/include)
     endif()
 
-    target_include_directories(${_target} PUBLIC include inline ${PROJECT_BINARY_DIR}/include ${MELT_ARGS_INCLUDE_DIRS})
-    target_link_libraries(${_target} PUBLIC ${MELT_ARGS_LIBRARIES})
-    target_include_directories(${_target} SYSTEM PUBLIC ${MELT_ARGS_SYSTEM_INCLUDE_DIRS})
+    generate_export_header(${_target} EXPORT_FILE_NAME
+                           ${_generated_include_dirs}/${_target}-export.hpp)
+    list(APPEND MELT_ARGS_HEADERS
+         ${_generated_include_dirs}/${_target}-export.hpp)
+    target_sources(${_target}
+                   PUBLIC ${_generated_include_dirs}/${_target}-export.hpp)
 
-    # setup melt warings
-    melt_setup_wanings(${_target})
+  else()
+    message(
+      FATAL_ERROR
+        "you should use melt_library or melt_executable, not _melt_target direclty"
+    )
+  endif()
 
-    if(MELT_ARGS_ALIAS)
-        add_library(${MELT_ARGS_ALIAS} ALIAS ${_target})
-    endif()
+  target_include_directories(
+    ${_target} PUBLIC include inline ${PROJECT_BINARY_DIR}/include
+                      ${MELT_ARGS_INCLUDE_DIRS})
+  target_link_libraries(${_target} PUBLIC ${MELT_ARGS_LIBRARIES})
+  target_include_directories(${_target} SYSTEM
+                             PUBLIC ${MELT_ARGS_SYSTEM_INCLUDE_DIRS})
 
-    if(MELT_ARGS_CXX_STANDARD)
-        set_target_properties(${_target} PROPERTIES CXX_STANDARD ${MELT_ARGS_CXX_STANDARD})
-        set_target_properties(${_target} PROPERTIES CXX_STANDARD_REQUIRED ON)
-    endif()
+  # setup melt warings
+  melt_setup_wanings(${_target})
 
-    if(MELT_ARGS_HEADERS)
-        set_target_properties(${_target} PROPERTIES PUBLIC_HEADER "${MELT_ARGS_HEADERS}")
-    endif()
+  if(MELT_ARGS_ALIAS)
+    add_library(${MELT_ARGS_ALIAS} ALIAS ${_target})
+  endif()
 
-    if(MELT_ARGS_DEFINITIONS)
-        target_compile_definitions(${_target} PUBLIC "${MELT_ARGS_DEFINITIONS}")
-    endif()
+  if(MELT_ARGS_CXX_STANDARD)
+    set_target_properties(${_target} PROPERTIES CXX_STANDARD
+                                                ${MELT_ARGS_CXX_STANDARD})
+    set_target_properties(${_target} PROPERTIES CXX_STANDARD_REQUIRED ON)
+  endif()
 
-    if(MELT_ARGS_COMPILE_OPTIONS)
-        target_compile_options(${_target} PUBLIC "${MELT_ARGS_COMPILE_OPTIONS}")
-    endif()
+  if(MELT_ARGS_HEADERS)
+    set_target_properties(${_target} PROPERTIES PUBLIC_HEADER
+                                                "${MELT_ARGS_HEADERS}")
+  endif()
 
-    if(MELT_EXTRA_FLAGS)
-        target_compile_options(${_target} PUBLIC "${MELT_EXTRA_FLAGS}")
-    endif()
+  if(MELT_ARGS_DEFINITIONS)
+    target_compile_definitions(${_target} PUBLIC "${MELT_ARGS_DEFINITIONS}")
+  endif()
 
-    if(MELT_${CMAKE_CXX_COMPILER_ID}_EXTRA_FLAGS)
-        target_compile_options(${_target} PUBLIC "${MELT_${CMAKE_CXX_COMPILER_ID}_EXTRA_FLAGS}")
-    endif()
+  if(MELT_ARGS_COMPILE_OPTIONS)
+    target_compile_options(${_target} PUBLIC "${MELT_ARGS_COMPILE_OPTIONS}")
+  endif()
 
-    if(MELT_${CMAKE_C_COMPILER_ID}_EXTRA_FLAGS)
-        target_compile_options(${_target} PUBLIC "${MELT_${CMAKE_C_COMPILER_ID}_EXTRA_FLAGS}")
-    endif()
+  if(MELT_EXTRA_FLAGS)
+    target_compile_options(${_target} PUBLIC "${MELT_EXTRA_FLAGS}")
+  endif()
 
-    if(NOT MELT_ARGS_NO_INSTALL)
-        install(TARGETS ${_target}
-            LIBRARY
-              DESTINATION lib
+  if(MELT_${CMAKE_CXX_COMPILER_ID}_EXTRA_FLAGS)
+    target_compile_options(
+      ${_target} PUBLIC "${MELT_${CMAKE_CXX_COMPILER_ID}_EXTRA_FLAGS}")
+  endif()
+
+  if(MELT_${CMAKE_C_COMPILER_ID}_EXTRA_FLAGS)
+    target_compile_options(${_target}
+                           PUBLIC "${MELT_${CMAKE_C_COMPILER_ID}_EXTRA_FLAGS}")
+  endif()
+
+  if(NOT MELT_ARGS_NO_INSTALL)
+    install(
+      TARGETS ${_target}
+      LIBRARY DESTINATION lib
               COMPONENT Libraries
               NAMELINK_COMPONENT Development
-            PUBLIC_HEADER
-              DESTINATION include/${MELT_ARGS_FOLDER}
-              COMPONENT Development
-        )
-    endif()
+      PUBLIC_HEADER DESTINATION include/${MELT_ARGS_FOLDER}
+                    COMPONENT Development)
+  endif()
 
-    if(MELT_ARGS_DOXYGEN)
-      melt_doxygen(${_target})
-    endif()
+  if(MELT_ARGS_DOXYGEN)
+    melt_doxygen(${_target})
+  endif()
 
-    if (EXISTS ${${_target}_SOURCE_DIR}/tests)
-      if(EXISTS ${${_target}_SOURCE_DIR}/tests/CMakeLists.txt)
-        add_subdirectory(${${_target}_SOURCE_DIR}/tests)
-      else()
-        message(STATUS "melt: discovering tests in ${${_target}_SOURCE_DIR}/tests")
-        melt_discover_tests(${${_target}_SOURCE_DIR}/tests LIBRARIES ${_target})
-      endif()
+  if(EXISTS ${${_target}_SOURCE_DIR}/tests)
+    if(EXISTS ${${_target}_SOURCE_DIR}/tests/CMakeLists.txt)
+      add_subdirectory(${${_target}_SOURCE_DIR}/tests)
+    else()
+      message(
+        STATUS "melt: discovering tests in ${${_target}_SOURCE_DIR}/tests")
+      melt_discover_tests(${${_target}_SOURCE_DIR}/tests LIBRARIES ${_target})
     endif()
+  endif()
 endmacro()
 
 macro(melt_library _target)
