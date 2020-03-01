@@ -1,0 +1,62 @@
+from conans import ConanFile, CMake, tools
+
+
+class MeltConanFile(ConanFile):
+    name = "@MELT_PACKAGE_NAME@"
+    license = "@MELT_PACKAGE_LICENSE@"
+    author = "@MELT_PACKAGE_AUTHOR@"
+    url = "@MELT_PACKAGE_URL@"
+    description = "@MELT_PACKAGE_DESCRIPTION@"
+    topics = ("conan", @MELT_PACKAGE_TOPICS@)
+    settings = "os", "compiler", "build_type", "arch"
+    generators = "cmake", "cmake_find_package"
+    scm = {
+        "type": "git",  # Use "type": "svn", if local repo is managed using SVN
+        "url": "@MELT_PACKAGE_SMC_URL@",
+        "revision": "auto"
+    }
+    requires = @MELT_PACKAGE_REQUIRES@
+    build_requires = @MELT_PACKAGE_BUILD_REQUIRES@
+    options = {"fPIC": [True, False], "shared": [True, False], @MELT_PACKAGE_OPTIONS@}
+    default_options = {
+        "fPIC": True,
+        "shared": False,
+        @MELT_PACKAGE_DEFAULT_OPTIONS@
+    }
+    no_copy_source = True
+
+    def set_version(self):
+        git = tools.Git(folder=self.recipe_folder)
+        self.version = str(git.get_tag())[1:] if git.get_tag() is not None else git.get_revision()
+
+    def deploy(self):
+        self.copy("*", dst="bin", src="bin")
+
+    def _cmake(self):
+        if hasattr(self, 'cmake'):
+            return self.cmake
+        self.cmake = CMake(self)
+        self.run_tests = tools.get_env("CONAN_RUN_TESTS", False)
+        self.cmake.definitions["BUILD_TESTING"] = "ON" if self.run_tests else "OFF"
+        self.cmake.configure()
+        return self.cmake
+
+    def configure(self):
+        tools.check_min_cppstd(self, "@CMAKE_CXX_STANDARD@")
+        if self.settings.os == "Windows":
+            del self.options.fPIC
+
+    def build(self):
+        cmake = self._cmake()
+        cmake.build()
+        if self.run_tests:
+            cmake.test()
+
+    def package(self):
+        cmake = self._cmake()
+        cmake.install()
+
+    def package_info(self):
+        self.cpp_info.libs = tools.collect_libs(self)
+        self.cpp_info.bindirs = ['bin']
+        self.cpp_info.build_modules.extend([@MELT_PACKAGE_BUILD_MODULES@])
