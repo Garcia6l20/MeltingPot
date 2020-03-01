@@ -1,6 +1,6 @@
 cmake_policy(SET CMP0076 NEW)
 
-function(melt_add_test _name)
+macro(melt_add_test _name)
 
   include(CTest)
 
@@ -93,7 +93,7 @@ function(melt_add_test _name)
     endif()
   endif()
   set_target_properties(${_target} PROPERTIES FOLDER ${_test_folder})
-endfunction()
+endmacro()
 
 macro(melt_discover_tests _dir)
   if(NOT _dir)
