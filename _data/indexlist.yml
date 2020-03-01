@@ -1,0 +1,8 @@
+docs_list_title: Documentation
+docs:
+
+- title: Quick start
+  url: /index.html
+
+- title: Dealing with conan
+  url: /docs/conan.html
