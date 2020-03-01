@@ -140,10 +140,6 @@ macro(_melt_target _target)
         set_target_properties(${_target} PROPERTIES CXX_STANDARD_REQUIRED ON)
     endif()
 
-    if (EXISTS ${${_target}_SOURCE_DIR}/tests)
-        add_subdirectory(${${_target}_SOURCE_DIR}/tests)
-    endif()
-
     if(MELT_ARGS_HEADERS)
         set_target_properties(${_target} PROPERTIES PUBLIC_HEADER "${MELT_ARGS_HEADERS}")
     endif()
@@ -182,6 +178,15 @@ macro(_melt_target _target)
 
     if(MELT_ARGS_DOXYGEN)
       melt_doxygen(${_target})
+    endif()
+
+    if (EXISTS ${${_target}_SOURCE_DIR}/tests)
+      if(EXISTS ${${_target}_SOURCE_DIR}/tests/CMakeLists.txt)
+        add_subdirectory(${${_target}_SOURCE_DIR}/tests)
+      else()
+        message(STATUS "melt: discovering tests in ${${_target}_SOURCE_DIR}/tests")
+        melt_discover_tests(${${_target}_SOURCE_DIR}/tests LIBRARIES ${_target})
+      endif()
     endif()
 endmacro()
 

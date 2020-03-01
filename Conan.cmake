@@ -1,4 +1,4 @@
-function(conan_requires)
+macro(conan_requires)
 
   if(CONAN_EXPORTED) # in conan local cache
       # standard conan installation, deps will be defined in conanfile.py
@@ -53,8 +53,8 @@ function(conan_requires)
         endforeach()
     endif()
 
-    set(MELT_${PROJECT_NAME}_REQUIRES ${_requires} PARENT_SCOPE)
-    set(MELT_${PROJECT_NAME}_DEFAULT_OPTIONS ${CONAN_OPTIONS} PARENT_SCOPE)
+    set(MELT_${PROJECT_NAME}_REQUIRES ${_requires})
+    set(MELT_${PROJECT_NAME}_DEFAULT_OPTIONS ${CONAN_OPTIONS})
 
     if(MELT_TESTING_BACKENDS)
       list(APPEND _requires ${MELT_TESTING_BACKENDS})
@@ -74,9 +74,8 @@ function(conan_requires)
 
   # expose conan's find packages
   list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
-  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} PARENT_SCOPE)
 
-endfunction()
+endmacro()
 
 function(_to_python_list _var)
   list(JOIN ${_var} "\", \"" _tmp)
@@ -95,7 +94,6 @@ function(conan_package)
   set(MELT_PACKAGE_NAME ${PROJECT_NAME})
   set(MELT_PACKAGE_REQUIRES ${MELT_${PROJECT_NAME}_REQUIRES})
   set(MELT_PACKAGE_BUILD_REQUIRES ${MELT_TESTING_BACKENDS})
-  message(STATUS "MELT_TESTING_BACKENDS: ${MELT_TESTING_BACKENDS}")
 
   set(options)
   set(oneValueArgs LICENSE AUTHOR URL SMC_URL)
