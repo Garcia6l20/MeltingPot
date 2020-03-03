@@ -10,12 +10,16 @@ macro(melt_add_test _name)
 
   set(_target ${PROJECT_NAME}-test-${_name})
 
+  if(NOT CATCH IN_LIST _MELT_TARGET_PARSE_OPTIONS)
+    list(APPEND _MELT_TARGET_PARSE_OPTIONS CATCH GTEST)
+  endif()
+
   if(NOT WORKING_DIRECTORY IN_LIST _MELT_TARGET_PARSE_ONE_VALUE_ARGS)
     list(APPEND _MELT_TARGET_PARSE_ONE_VALUE_ARGS WORKING_DIRECTORY)
   endif()
 
-  if(NOT CATCH IN_LIST _MELT_TARGET_PARSE_OPTIONS)
-    list(APPEND _MELT_TARGET_PARSE_OPTIONS CATCH GTEST)
+  if(NOT EXTRA_ARGS IN_LIST _MELT_TARGET_PARSE_MULTI_VALUE_ARGS)
+    list(APPEND _MELT_TARGET_PARSE_MULTI_VALUE_ARGS EXTRA_ARGS)
   endif()
 
   # add cache variable to disable this test
@@ -66,8 +70,9 @@ macro(melt_add_test _name)
            OR MELT_TESTING_DEFAULT_BACKEND STREQUAL GTEST)
           target_link_libraries(${_target} PRIVATE CONAN_PKG::gtest)
           include(GoogleTest)
-          gtest_discover_tests(${_target} WORKING_DIRECTORY
-                               ${MELT_ARGS_WORKING_DIRECTORY})
+          gtest_discover_tests(${_target}
+                               WORKING_DIRECTORY ${MELT_ARGS_WORKING_DIRECTORY}
+                               EXTRA_ARGS ${MELT_ARGS_EXTRA_ARGS})
         endif()
       endif()
     endif()
@@ -78,8 +83,9 @@ macro(melt_add_test _name)
            OR MELT_TESTING_DEFAULT_BACKEND STREQUAL CATCH)
           include(Catch)
           target_link_libraries(${_target} PRIVATE CONAN_PKG::catch2)
-          catch_discover_tests(${_target} WORKING_DIRECTORY
-                               ${MELT_ARGS_WORKING_DIRECTORY})
+          catch_discover_tests(${_target}
+                               WORKING_DIRECTORY ${MELT_ARGS_WORKING_DIRECTORY}
+                               EXTRA_ARGS ${MELT_ARGS_EXTRA_ARGS})
         endif()
       endif()
     endif()

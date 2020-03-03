@@ -84,7 +84,8 @@ set(_MELT_TARGET_PARSE_MULTI_VALUE_ARGS
     DEFINITIONS
     INCLUDE_DIRS
     SYSTEM_INCLUDE_DIRS
-    COMPILE_OPTIONS)
+    COMPILE_OPTIONS
+    PCH)
 
 macro(_melt_target _target)
   cmake_parse_arguments(
@@ -155,13 +156,12 @@ macro(_melt_target _target)
     target_compile_options(${_target} PUBLIC "${MELT_ARGS_COMPILE_OPTIONS}")
   endif()
 
-  if(MELT_EXTRA_FLAGS)
-    target_compile_options(${_target} PUBLIC "${MELT_EXTRA_FLAGS}")
+  if(MELT_ARGS_EXTRA_FLAGS)
+    target_compile_options(${_target} PUBLIC "${MELT_ARGS_EXTRA_FLAGS}")
   endif()
 
-  if(MELT_${CMAKE_CXX_COMPILER_ID}_EXTRA_FLAGS)
-    target_compile_options(
-      ${_target} PUBLIC "${MELT_${CMAKE_CXX_COMPILER_ID}_EXTRA_FLAGS}")
+  if(MELT_ARGS_PCH)
+    target_precompile_headers(${_target} PUBLIC "${MELT_ARGS_PCH}")
   endif()
 
   if(MELT_${CMAKE_C_COMPILER_ID}_EXTRA_FLAGS)
