@@ -160,7 +160,7 @@ macro(_melt_target _target)
     target_compile_options(${_target} PUBLIC "${MELT_ARGS_EXTRA_FLAGS}")
   endif()
 
-  if(MELT_ARGS_PCH)
+  if(MELT_ARGS_PCH AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.14.0)
     target_precompile_headers(${_target} PUBLIC "${MELT_ARGS_PCH}")
   endif()
 
@@ -172,6 +172,9 @@ macro(_melt_target _target)
   if(NOT MELT_ARGS_NO_INSTALL)
     install(
       TARGETS ${_target}
+      RUNTIME DESTINATION bin
+      ARCHIVE DESTINATION lib
+              COMPONENT Libraries
       LIBRARY DESTINATION lib
               COMPONENT Libraries
               NAMELINK_COMPONENT Development
