@@ -73,7 +73,7 @@ set(GCC_WARNINGS
 
 if(MSVC)
   set(MELT_WARNINGS ${MSVC_WARNINGS})
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR MELT_ENABLE_CLANG_TIDY)
   set(MELT_WARNINGS ${CLANG_WARNINGS})
 else()
   set(MELT_WARNINGS ${GCC_WARNINGS})
@@ -87,6 +87,5 @@ if(MELT_SUPPRESS_WARNINGS)
   list(REMOVE_ITEM MELT_WARNINGS ${MELT_SUPPRESS_WARNINGS})
 endif()
 
-function(melt_setup_wanings _target)
-  target_compile_options(${_target} PRIVATE ${MELT_WARNINGS})
-endfunction()
+message(STATUS "MELT_WARNINGS: ${MELT_WARNINGS}")
+target_compile_options(_melt_options INTERFACE ${MELT_WARNINGS})

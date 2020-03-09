@@ -25,6 +25,11 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.melt_options)
   endforeach()
 endif()
 
+# interface library that will hold options
+add_library(_melt_options INTERFACE)
+# convenient alias
+add_library(Melt::options ALIAS _melt_options)
+
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(
@@ -37,12 +42,15 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
                                                "MinSizeRel" "RelWithDebInfo")
 endif()
 
-find_program(CCACHE ccache)
-if(CCACHE)
-  message("using ccache")
-  set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
-else()
-  message("ccache not found cannot use")
+option(MELT_ENABLE_CCACHE "Enable ccache" ON)
+if(MELT_ENABLE_CCACHE)
+  find_program(CCACHE ccache)
+  if(CCACHE)
+    message("using ccache")
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
+  else()
+    message("ccache not found cannot use")
+  endif()
 endif()
 
 # Generate compile_commands.json to make it easier to work with clang based
@@ -127,11 +135,9 @@ macro(_melt_target _target)
     ${_target} PUBLIC include inline ${PROJECT_BINARY_DIR}/include
                       ${MELT_ARGS_INCLUDE_DIRS})
   target_link_libraries(${_target} PUBLIC ${MELT_ARGS_LIBRARIES})
+  target_link_libraries(${_target} PRIVATE Melt::options)
   target_include_directories(${_target} SYSTEM
                              PUBLIC ${MELT_ARGS_SYSTEM_INCLUDE_DIRS})
-
-  # setup melt warings
-  melt_setup_wanings(${_target})
 
   if(MELT_ARGS_ALIAS)
     add_library(${MELT_ARGS_ALIAS} ALIAS ${_target})

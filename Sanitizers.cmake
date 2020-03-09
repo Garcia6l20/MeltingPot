@@ -3,8 +3,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL
   option(MELT_ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" OFF)
 
   if(ENABLE_COVERAGE)
-    target_compile_options(_std_project INTERFACE --coverage -O0 -g)
-    target_link_libraries(_std_project INTERFACE --coverage)
+    target_compile_options(_melt_options INTERFACE --coverage -O0 -g)
+    target_link_libraries(_melt_options INTERFACE --coverage)
   endif()
 
   set(SANITIZERS "")
@@ -36,9 +36,9 @@ endif()
 
 if(LIST_OF_SANITIZERS)
   if(NOT "${LIST_OF_SANITIZERS}" STREQUAL "")
-    target_compile_options(${project_name}
+    target_compile_options(_melt_options
                            INTERFACE -fsanitize=${LIST_OF_SANITIZERS})
-    target_link_libraries(${project_name}
+    target_link_libraries(_melt_options
                           INTERFACE -fsanitize=${LIST_OF_SANITIZERS})
   endif()
 endif()

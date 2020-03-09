@@ -23,7 +23,7 @@ macro(melt_add_test _name)
   endif()
 
   # add cache variable to disable this test
-  set(_no_test_var_name "${PROJECT_NAME}_NO_${_name}")
+  set(_no_test_var_name "${PROJECT_NAME}_NO_TEST_${_name}")
   string(TOUPPER ${_no_test_var_name} _no_test_var_name)
   string(REPLACE "-" "_" _no_test_var_name ${_no_test_var_name})
   set(${_no_test_var_name}

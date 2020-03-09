@@ -11,7 +11,7 @@ endif()
 
 option(MELT_ENABLE_CLANG_TIDY "Enable static analysis with clang-tidy" OFF)
 if(MELT_ENABLE_CLANG_TIDY)
-  find_program(CLANGTIDY clang-tidy)
+  find_program(CLANGTIDY NAMES clang-tidy clang-tidy-11 clang-tidy-10 clang-tidy-9)
   if(CLANGTIDY)
     set(CMAKE_CXX_CLANG_TIDY ${CLANGTIDY})
   else()
