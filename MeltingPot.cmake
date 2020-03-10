@@ -25,10 +25,12 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.melt_options)
   endforeach()
 endif()
 
-# interface library that will hold options
-add_library(_melt_options INTERFACE)
-# convenient alias
-add_library(Melt::options ALIAS _melt_options)
+if(NOT TARGET _melt_options)
+  # interface library that will hold options
+  add_library(_melt_options INTERFACE)
+  # convenient alias
+  add_library(Melt::options ALIAS _melt_options)
+endif()
 
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
