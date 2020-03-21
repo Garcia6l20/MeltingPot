@@ -62,15 +62,16 @@ macro(conan_requires)
       REQUIRES
       ${_requires}
       OPTIONS
-      ${CONAN_OPTIONS}
+        "${CONAN_OPTIONS}"
       BASIC_SETUP
       CMAKE_TARGETS # individual targets to link to
       GENERATORS
-      cmake_find_package
+        cmake_find_package
       BUILD
-      "${CONAN_BUILD}"
+        "${CONAN_BUILD}"
+      SETTINGS compiler.cppstd=${CMAKE_CXX_STANDARD}
       ARCH
-      "${CONAN_ARCH}")
+        "${CONAN_ARCH}")
 
   endif()
 

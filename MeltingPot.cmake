@@ -95,6 +95,7 @@ set(_MELT_TARGET_PARSE_MULTI_VALUE_ARGS
     INCLUDE_DIRS
     SYSTEM_INCLUDE_DIRS
     COMPILE_OPTIONS
+    LINK_FLAGS
     PCH)
 
 macro(_melt_target _target)
@@ -121,6 +122,8 @@ macro(_melt_target _target)
 
     generate_export_header(${_target} EXPORT_FILE_NAME
                            ${_generated_include_dirs}/${_target}-export.hpp)
+    set_source_files_properties(${_generated_include_dirs}/${_target}-export.hpp
+                                PROPERTIES GENERATED TRUE)
     list(APPEND MELT_ARGS_HEADERS
          ${_generated_include_dirs}/${_target}-export.hpp)
     target_sources(${_target}
@@ -166,6 +169,10 @@ macro(_melt_target _target)
 
   if(MELT_ARGS_EXTRA_FLAGS)
     target_compile_options(${_target} PUBLIC "${MELT_ARGS_EXTRA_FLAGS}")
+  endif()
+
+  if(MELT_ARGS_LINK_FLAGS)
+    target_link_options(${_target} PUBLIC "${MELT_ARGS_LINK_FLAGS}")
   endif()
 
   if(MELT_ARGS_PCH AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.14.0)
