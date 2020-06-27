@@ -58,6 +58,10 @@ macro(conan_requires)
       list(APPEND _requires ${MELT_TESTING_BACKENDS})
     endif()
 
+    if (CMAKE_CXX_STANDARD)
+      list(APPEND _extra_args SETTINGS compiler.cppstd=${CMAKE_CXX_STANDARD})
+    endif()
+
     conan_cmake_run(
       REQUIRES
       ${_requires}
@@ -69,9 +73,9 @@ macro(conan_requires)
         cmake_find_package
       BUILD
         "${CONAN_BUILD}"
-      SETTINGS compiler.cppstd=${CMAKE_CXX_STANDARD}
       ARCH
-        "${CONAN_ARCH}")
+        "${CONAN_ARCH}"
+      ${_extra_args})
 
   endif()
 

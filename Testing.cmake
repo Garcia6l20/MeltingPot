@@ -46,6 +46,11 @@ macro(melt_add_test _name)
     set(MELT_ARGS_WORKING_DIRECTORY ${${PROJECT_NAME}_BINARY_DIR})
   endif()
 
+  if(MELT_TESTING_BACKENDS AND (NOT TARGET CONAN_PKG::gtest AND NOT TARGET CONAN_PKG::catch2))
+    message(STATUS "melt: retrieving testing backend(s): ${MELT_TESTING_BACKENDS}")
+    conan_requires(${MELT_TESTING_BACKENDS} BUILD outdated)
+  endif()
+
   if(NOT ${${_no_test_var_name}})
     if(TARGET CONAN_PKG::gtest AND TARGET CONAN_PKG::catch2)
       if(NOT MELT_TESTING_DEFAULT_BACKEND)

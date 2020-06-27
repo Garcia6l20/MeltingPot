@@ -71,6 +71,10 @@ set(GCC_WARNINGS
     -Wuseless-cast # warn if you perform a cast to the same type
 )
 
+if(NOT CMAKE_CXX_COMPILER_ID)
+  project(__fake_melt_projet CXX)
+endif()
+
 if(MSVC)
   set(MELT_WARNINGS ${MSVC_WARNINGS})
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR MELT_ENABLE_CLANG_TIDY)

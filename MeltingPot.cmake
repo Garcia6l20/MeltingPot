@@ -95,6 +95,7 @@ set(_MELT_TARGET_PARSE_MULTI_VALUE_ARGS
     INCLUDE_DIRS
     SYSTEM_INCLUDE_DIRS
     COMPILE_OPTIONS
+    COMPILE_FEATURES
     LINK_FLAGS
     PCH)
 
@@ -165,6 +166,10 @@ macro(_melt_target _target)
 
   if(MELT_ARGS_COMPILE_OPTIONS)
     target_compile_options(${_target} PUBLIC "${MELT_ARGS_COMPILE_OPTIONS}")
+  endif()
+
+  if(MELT_ARGS_COMPILE_FEATURES)
+    target_compile_features(${_target} PUBLIC "${MELT_ARGS_COMPILE_FEATURES}")
   endif()
 
   if(MELT_ARGS_EXTRA_FLAGS)
