@@ -84,7 +84,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/Warnings.cmake)
 include(GenerateExportHeader)
 
 # extends those args to extend melt_library/executable
-set(_MELT_TARGET_PARSE_OPTIONS IS_EXECUTABLE IS_LIBRARY SHARED NO_INSTALL
+set(_MELT_TARGET_PARSE_OPTIONS IS_EXECUTABLE IS_LIBRARY SHARED INTERFACE NO_INSTALL
                                DOXYGEN)
 set(_MELT_TARGET_PARSE_ONE_VALUE_ARGS ALIAS CXX_STANDARD FOLDER)
 set(_MELT_TARGET_PARSE_MULTI_VALUE_ARGS
@@ -104,31 +104,40 @@ macro(_melt_target _target)
     MELT_ARGS "${_MELT_TARGET_PARSE_OPTIONS}"
     "${_MELT_TARGET_PARSE_ONE_VALUE_ARGS}"
     "${_MELT_TARGET_PARSE_MULTI_VALUE_ARGS}" "${ARGN}")
+  set(_public PUBLIC)
   if(MELT_ARGS_IS_EXECUTABLE)
     add_executable(${_target} ${MELT_ARGS_SOURCES} ${MELT_ARGS_HEADERS})
   elseif(MELT_ARGS_IS_LIBRARY)
     if(MELT_ARGS_SHARED)
       set(_lib_type SHARED)
     endif()
+    if(MELT_ARGS_INTERFACE)
+      set(_lib_type INTERFACE)
+      set(_public INTERFACE)
+    endif()
 
     add_library(${_target} ${_lib_type} ${MELT_ARGS_SOURCES}
                            ${MELT_ARGS_HEADERS})
     if(MELT_ARGS_FOLDER)
-      set_target_properties(${_target} PROPERTIES FOLDER ${MELT_ARGS_FOLDER})
+      if(NOT MELT_ARGS_INTERFACE)
+        set_target_properties(${_target} PROPERTIES FOLDER ${MELT_ARGS_FOLDER})
+      endif()
       set(_generated_include_dirs
           ${PROJECT_BINARY_DIR}/include/${MELT_ARGS_FOLDER})
     else()
       set(_generated_include_dirs ${PROJECT_BINARY_DIR}/include)
     endif()
 
-    generate_export_header(${_target} EXPORT_FILE_NAME
-                           ${_generated_include_dirs}/${_target}-export.hpp)
-    set_source_files_properties(${_generated_include_dirs}/${_target}-export.hpp
-                                PROPERTIES GENERATED TRUE)
-    list(APPEND MELT_ARGS_HEADERS
-         ${_generated_include_dirs}/${_target}-export.hpp)
-    target_sources(${_target}
-                   PUBLIC ${_generated_include_dirs}/${_target}-export.hpp)
+    if(NOT MELT_ARGS_INTERFACE)
+      generate_export_header(${_target} EXPORT_FILE_NAME
+                             ${_generated_include_dirs}/${_target}-export.hpp)
+      set_source_files_properties(${_generated_include_dirs}/${_target}-export.hpp
+                                  PROPERTIES GENERATED TRUE)
+      list(APPEND MELT_ARGS_HEADERS
+           ${_generated_include_dirs}/${_target}-export.hpp)
+      target_sources(${_target}
+                     PUBLIC ${_generated_include_dirs}/${_target}-export.hpp)
+    endif()
 
   else()
     message(
@@ -138,21 +147,31 @@ macro(_melt_target _target)
   endif()
 
   target_include_directories(
-    ${_target} PUBLIC include inline ${PROJECT_BINARY_DIR}/include
+    ${_target} ${_public} include inline ${PROJECT_BINARY_DIR}/include
                       ${MELT_ARGS_INCLUDE_DIRS})
-  target_link_libraries(${_target} PUBLIC ${MELT_ARGS_LIBRARIES})
-  target_link_libraries(${_target} PRIVATE Melt::options)
-  target_include_directories(${_target} SYSTEM
-                             PUBLIC ${MELT_ARGS_SYSTEM_INCLUDE_DIRS})
+  target_link_libraries(${_target} ${_public} ${MELT_ARGS_LIBRARIES})
+  if(NOT MELT_ARGS_INTERFACE)
+    target_link_libraries(${_target} PRIVATE Melt::options)
+  endif()
+#  if(NOT MELT_ARGS_INTERFACE)
+    target_include_directories(${_target} SYSTEM
+      ${_public} ${MELT_ARGS_SYSTEM_INCLUDE_DIRS})
+#  else()
+#    target_include_directories(${_target} INTERFACE ${MELT_ARGS_SYSTEM_INCLUDE_DIRS})
+#  endif()
 
   if(MELT_ARGS_ALIAS)
     add_library(${MELT_ARGS_ALIAS} ALIAS ${_target})
   endif()
 
   if(MELT_ARGS_CXX_STANDARD)
-    set_target_properties(${_target} PROPERTIES CXX_STANDARD
-                                                ${MELT_ARGS_CXX_STANDARD})
-    set_target_properties(${_target} PROPERTIES CXX_STANDARD_REQUIRED ON)
+    if (MELT_ARGS_INTERFACE)
+      message(FATAL_ERROR "Cannot use CXX_STANDARD on INTERFACE libraries")
+    else()
+      set_target_properties(${_target} PROPERTIES CXX_STANDARD
+                                                  ${MELT_ARGS_CXX_STANDARD})
+      set_target_properties(${_target} PROPERTIES CXX_STANDARD_REQUIRED ON)
+    endif()
   endif()
 
   if(MELT_ARGS_HEADERS)
@@ -161,11 +180,11 @@ macro(_melt_target _target)
   endif()
 
   if(MELT_ARGS_DEFINITIONS)
-    target_compile_definitions(${_target} PUBLIC "${MELT_ARGS_DEFINITIONS}")
+    target_compile_definitions(${_target} ${_public} "${MELT_ARGS_DEFINITIONS}")
   endif()
 
   if(MELT_ARGS_COMPILE_OPTIONS)
-    target_compile_options(${_target} PUBLIC "${MELT_ARGS_COMPILE_OPTIONS}")
+    target_compile_options(${_target} ${_public} "${MELT_ARGS_COMPILE_OPTIONS}")
   endif()
 
   if(MELT_ARGS_COMPILE_FEATURES)
@@ -173,20 +192,20 @@ macro(_melt_target _target)
   endif()
 
   if(MELT_ARGS_EXTRA_FLAGS)
-    target_compile_options(${_target} PUBLIC "${MELT_ARGS_EXTRA_FLAGS}")
+    target_compile_options(${_target} ${_public} "${MELT_ARGS_EXTRA_FLAGS}")
   endif()
 
   if(MELT_ARGS_LINK_FLAGS)
-    target_link_options(${_target} PUBLIC "${MELT_ARGS_LINK_FLAGS}")
+    target_link_options(${_target} ${_public} "${MELT_ARGS_LINK_FLAGS}")
   endif()
 
   if(MELT_ARGS_PCH AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.14.0)
-    target_precompile_headers(${_target} PUBLIC "${MELT_ARGS_PCH}")
+    target_precompile_headers(${_target} ${_public} "${MELT_ARGS_PCH}")
   endif()
 
   if(MELT_${CMAKE_C_COMPILER_ID}_EXTRA_FLAGS)
     target_compile_options(${_target}
-                           PUBLIC "${MELT_${CMAKE_C_COMPILER_ID}_EXTRA_FLAGS}")
+                           ${_public} "${MELT_${CMAKE_C_COMPILER_ID}_EXTRA_FLAGS}")
   endif()
 
   if(NOT MELT_ARGS_NO_INSTALL)
