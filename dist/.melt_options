@@ -1,0 +1,48 @@
+# Enable doxygen doc builds of source
+# ENABLE_DOXYGEN = ON
+
+# Enable Iterprocedural Optimization, aka Link Time Optimization (LTO)
+# ENABLE_IPO = ON
+
+# Enable vagrind memorycheck of tests
+# ENABLE_CTEST_VALGRIND = ON
+
+# Enable coverage reporting for gcc/clang
+# ENABLE_COVERAGE = ON
+
+# Enable address sanitizer
+# ENABLE_SANITIZER_ADDRESS = ON
+
+# Enable memory sanitizer
+# ENABLE_SANITIZER_MEMORY = ON
+
+# Enable undefined behavior sanitizer
+# ENABLE_SANITIZER_UNDEFINED_BEHAVIOR = ON
+
+# Enable thread sanitizer
+# ENABLE_SANITIZER_THREAD = ON
+
+# Enable static analysis with cppcheck
+# ENABLE_CPPCHECK = ON
+
+# Enable static analysis with clang-tidy
+# ENABLE_CLANG_TIDY = ON
+
+# Treat compiler warnings as errors
+# WARNINGS_AS_ERRORS = ON
+
+# Suppress warnings
+#SUPPRESS_WARNINGS = -Wuseless-cast \
+#                    -Wduplicated-cond
+
+# Global extra flags
+# EXTRA_FLAGS = -Wno-error=shadow
+
+# Testing backends
+# TESTING_BACKENDS = gtest/1.10.0 \
+#                    catch2/2.11.0
+
+# Default testing backend
+# When used together you must specify the default backend
+# and/or pass GTEST/CATCH option to melt_add_test to use the required backend
+# TESTING_DEFAULT_BACKEND = GTEST
